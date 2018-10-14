@@ -1,18 +1,15 @@
 defmodule Bmo do
-  @moduledoc """
-  Documentation for Bmo.
-  """
+  use Application
+  use Supervisor
 
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Bmo.hello()
-      :world
-
-  """
-  def hello do
-    :world
+  def start(_type, _args) do
+    children = [
+      worker(Consumer, [])
+    ]
+    options = [
+      strategy: :one_for_one,
+      name: __MODULE__
+    ]
+    Supervisor.start_link(children, options)
   end
 end
