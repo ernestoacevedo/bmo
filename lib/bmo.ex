@@ -4,7 +4,7 @@ defmodule Bmo do
 
   def start(_type, _args) do
     children = [
-      worker(Consumer, [])
+      worker(Bmo.Consumer, [])
     ]
     options = [
       strategy: :one_for_one,
