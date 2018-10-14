@@ -1,0 +1,4 @@
+config :coxir,
+  token: "my_token",
+  shards: 1, # optional
+  ffmpeg: "" # optional
