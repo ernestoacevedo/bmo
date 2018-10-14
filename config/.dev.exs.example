@@ -3,4 +3,5 @@ use Mix.Config
 config :coxir,
   token: "my_token",
   shards: 1, # optional
-  ffmpeg: "" # optional
+  ffmpeg: "", # optional
+  youtube_dl: "" #optional

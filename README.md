@@ -1,5 +1,10 @@
 # Bmo
 
+## Requirements
+
+- FFmpeg
+- youtube-dl
+
 ## Install dependencies
 
 `mix deps.get`
