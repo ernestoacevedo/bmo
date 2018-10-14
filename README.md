@@ -1,6 +1,12 @@
 # Bmo
 
-**TODO: Add description**
+## Install dependencies
+
+`mix deps.get`
+
+## Run application
+
+`mix run --no-halt`
 
 ## Installation
 
