@@ -12,7 +12,7 @@ defmodule Bmo.Commands do
   defp io_data_stream(data, options) do
     IO.inspect data
     volume = (options[:vol] || 100) / 100
-    opts = [in: data, out: :stream] 
+    opts = [in: data, out: :stream]
     %Proc{out: audio_stream} =
       Porcelain.spawn(Application.fetch_env!(:coxir, :ffmpeg),
         ["-hide_banner", "-loglevel", "quiet", "-i","pipe:0",
@@ -53,6 +53,16 @@ defmodule Bmo.Commands do
   command stop do
     member.voice
     |> Voice.stop_playing
+  end
+
+  command atata do
+    msg = ~w(atatata atatatatatatata aTatAtAa
+    https://www.youtube.com/watch?v=0jyAmP3yGuM https://www.youtube.com/watch?v=0oTgA4RVx0E
+    https://www.youtube.com/watch?v=L5P9IeMMoHI https://www.youtube.com/watch?v=_Z7UJPsrAT0
+    https://www.youtube.com/watch?v=Bxbg7zaY4MU https://www.youtube.com/watch?v=rEDC5aVwna0
+    https://www.youtube.com/watch?v=ZUKVH44Vl1k)
+    |> Enum.random
+    Message.reply(message, msg)
   end
 
 end
