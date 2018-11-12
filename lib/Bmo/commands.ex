@@ -65,4 +65,22 @@ defmodule Bmo.Commands do
     Message.reply(message, msg)
   end
 
+  command pikasen(search) do
+    url = "#{Application.fetch_env!(:coxir, :pikasen_url)}#{search}"
+    case HTTPoison.get(url) do
+      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+        case Jason.decode(body) do
+          {:ok, list} ->
+            item = List.first(list)
+            message = "#{Application.fetch_env!(:coxir, :pikasen_cdn)}#{item["directory"]}/#{item["image"]}"
+            User.send_message(author, "😏 #{message}")
+          {:error, _} ->
+            User.send_message(author, "No encontré resultados 😟")
+        end
+      {:ok, %HTTPoison.Response{status_code: 404}} ->
+        User.send_message(author, "No encontré resultados 😟")
+      {:error, %HTTPoison.Error{reason: reason}} ->
+        IO.inspect reason
+    end
+  end
 end
