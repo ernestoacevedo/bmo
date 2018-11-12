@@ -23,3 +23,5 @@ erl_crash.dump
 bmo-*.tar
 
 dev.exs
+test.exs
+.elixir_ls/
