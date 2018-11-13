@@ -110,4 +110,27 @@ defmodule Bmo.Commands do
         Message.reply(message, "No encontré nada")
     end
   end
+
+  command horoscopo(sign) do
+    url = "https://api.adderou.cl/tyaas/"
+    case HTTPoison.get(url) do
+      {:ok, %{status_code: 200, body: body}} ->
+        {:ok, response} = body |> Jason.decode
+        prediction = response["horoscopo"] |> Map.get(sign)
+        if prediction do
+          msg = """
+          ❤️ #{prediction["amor"]}\n
+          🤒 #{prediction["salud"]}\n
+          💰 #{prediction["dinero"]}\n
+          🔢 #{prediction["numero"]}\n
+          🎨 #{prediction["color"]}\n
+          """
+          Message.reply(message, msg)
+        else
+          Message.reply(message, "Ese no es un signo válido")
+        end
+      {:error, _} ->
+        Message.reply(message, "Ocurrió un error")
+    end
+  end
 end
