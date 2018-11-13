@@ -111,6 +111,36 @@ defmodule Bmo.Commands do
     end
   end
 
+  command gif(search) do
+    url = "https://www.googleapis.com/customsearch/v1"
+    headers = []
+    opts = [
+      params: [
+        q: search,
+        searchType: "image",
+        fileType: "gif",
+        hq: "animated",
+        tbs: "itp:animated",
+        safe: "high",
+        fields: "items(link)",
+        cx: Application.fetch_env!(:coxir, :cse_id),
+        key: Application.fetch_env!(:coxir, :cse_key),
+      ]
+    ]
+
+    case HTTPoison.get(url, headers, opts) do
+      {:ok, %{status_code: 200, body: body}} ->
+        {:ok, res} = Jason.decode(body)
+        item = res["items"] |> Enum.random
+        Message.reply(message, item["link"])
+      {:ok, %{status_code: 400, body: body}} ->
+        IO.inspect body
+        Message.reply(message, "Ocurrió un error")
+      {:error, _} ->
+        Message.reply(message, "No encontré nada")
+    end
+  end
+
   command horoscopo(sign) do
     url = "https://api.adderou.cl/tyaas/"
     case HTTPoison.get(url) do
