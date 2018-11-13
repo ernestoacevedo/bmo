@@ -71,7 +71,7 @@ defmodule Bmo.Commands do
       {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
         case Jason.decode(body) do
           {:ok, list} ->
-            item = List.first(list)
+            item = Enum.random(list)
             message = "#{Application.fetch_env!(:coxir, :pikasen_cdn)}#{item["directory"]}/#{item["image"]}"
             User.send_message(author, "😏 #{message}")
           {:error, _} ->
