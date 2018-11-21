@@ -14,7 +14,7 @@ defmodule Bmo.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      extra_applications: [:logger, :httpoison],
+      extra_applications: [:logger, :httpoison, :timex],
       mod: {Bmo, []}
     ]
   end
@@ -26,7 +26,8 @@ defmodule Bmo.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"},
       {:coxir, git: "https://github.com/satom99/coxir.git"},
       {:coxir_commander, git: "https://github.com/satom99/coxir_commander.git"},
-      {:porcelain, "~> 2.0"}
+      {:porcelain, "~> 2.0"},
+      {:timex, "~> 3.1"}
     ]
   end
 end
