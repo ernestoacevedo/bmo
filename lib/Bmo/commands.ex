@@ -1,6 +1,7 @@
 defmodule Bmo.Commands do
   use Timex
   use Coxir.Commander
+  require IEx
   alias Porcelain.Process, as: Proc
 
   defp url_stream(url, options) do
@@ -170,5 +171,40 @@ defmodule Bmo.Commands do
       {:error, _} ->
         Message.reply(message, "Ocurrió un error")
     end
+  end
+
+  command random(options) do
+    option = String.split(options, ",") |> Enum.random
+    Message.reply(message, "🎲 #{option}")
+  end
+
+  command help do
+    list = help()
+    Message.reply(message, list)
+  end
+
+  command ayuda do
+    list = help()
+    Message.reply(message, list)
+  end
+
+  command aiura do
+    list = help()
+    Message.reply(message, list)
+  end
+
+  command test do
+    IEx.pry
+  end
+
+  defp help() do
+    list = """
+    **,img <algo>** Muestra una imagen al azar.
+    **,gif <algo>** Muestra un gif al azar.
+    **,pikasen <algo>** Envía una imagen por interno (Utilizar con precaución).
+    **,atata** Retorna un atata 🐶.
+    **,horoscopo <signo>** Muestra el horóscopo del signo solicitado.
+    **,random <opcion1,opcion2>** Escoge una opción al azar.
+    """
   end
 end
