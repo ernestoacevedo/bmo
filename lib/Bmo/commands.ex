@@ -1,4 +1,5 @@
 defmodule Bmo.Commands do
+  use Timex
   use Coxir.Commander
   alias Porcelain.Process, as: Proc
 
@@ -66,21 +67,28 @@ defmodule Bmo.Commands do
   end
 
   command pikasen(search) do
-    url = "#{Application.fetch_env!(:coxir, :pikasen_url)}#{search}"
-    case HTTPoison.get(url) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        case Jason.decode(body) do
-          {:ok, list} ->
-            item = Enum.random(list)
-            message = "#{Application.fetch_env!(:coxir, :pikasen_cdn)}#{item["directory"]}/#{item["image"]}"
-            User.send_message(author, "😏 #{message}")
-          {:error, _} ->
-            User.send_message(author, "No encontré resultados 😟")
-        end
-      {:ok, %HTTPoison.Response{status_code: 404}} ->
-        User.send_message(author, "No encontré resultados 😟")
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        IO.inspect reason
+    if message.author.id == "134688787002425344" do
+      end_timex = Timex.parse!("2020-09-26 00:00:00", "%Y-%m-%d %H:%M:%S", :strftime)
+      start_timex = Timex.now
+      diff_in_days = Timex.diff(end_timex, start_timex, :days)
+      Message.reply(message, "Lo siento, eres demasiado 👶🏻 para utilizar este comando. Inténtalo en #{diff_in_days} días más.")
+    else
+      url = "#{Application.fetch_env!(:coxir, :pikasen_url)}#{search}"
+      case HTTPoison.get(url) do
+        {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
+          case Jason.decode(body) do
+            {:ok, list} ->
+              item = Enum.random(list)
+              message = "#{Application.fetch_env!(:coxir, :pikasen_cdn)}#{item["directory"]}/#{item["image"]}"
+              User.send_message(author, "😏 #{message}")
+            {:error, _} ->
+              User.send_message(author, "No encontré resultados 😟")
+          end
+        {:ok, %HTTPoison.Response{status_code: 404}} ->
+          User.send_message(author, "No encontré resultados 😟")
+        {:error, %HTTPoison.Error{reason: reason}} ->
+          IO.inspect reason
+      end
     end
   end
 
