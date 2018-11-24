@@ -168,10 +168,6 @@ defmodule Bmo.Commands do
     Message.reply(message, list)
   end
 
-  command test do
-    IEx.pry
-  end
-
   defp help() do
     list = """
     **,img <algo>** Muestra una imagen al azar.
