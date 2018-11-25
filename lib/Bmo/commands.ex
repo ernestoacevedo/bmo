@@ -99,6 +99,31 @@ defmodule Bmo.Commands do
     end
   end
 
+  command yt(search) do
+    url = "https://www.googleapis.com/youtube/v3/search"
+    headers = []
+    opts = [
+      params: [
+        key: Application.fetch_env!(:coxir, :cse_key),
+        part: "id",
+        type: "video",
+        order: "relevance",
+        maxResults: 15,
+        q: search,
+      ]
+    ]
+
+    case HTTPoison.get(url, headers, opts) do
+      {:ok, %{status_code: 200, body: body}} ->
+        res = Jason.decode! body
+        items = res["items"]
+        video_id = Enum.at(items, 0)["id"]["videoId"]
+        Message.reply(message, "https://youtu.be/#{video_id}")
+      _ ->
+        Message.reply(message, "No encontré nada")
+    end
+  end
+
   command horoscopo(sign) do
     url = "https://api.adderou.cl/tyaas/"
     case HTTPoison.get(url) do
