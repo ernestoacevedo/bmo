@@ -7,37 +7,52 @@ defmodule Bmo.Commands do
   @prefix ","
 
   command atata do
-    msg = ~w(atatata atatatatatatata aTatAtAa
+    msg =
+      ~w(atatata atatatatatatata aTatAtAa
     https://www.youtube.com/watch?v=0jyAmP3yGuM https://www.youtube.com/watch?v=0oTgA4RVx0E
     https://www.youtube.com/watch?v=L5P9IeMMoHI https://www.youtube.com/watch?v=_Z7UJPsrAT0
     https://www.youtube.com/watch?v=Bxbg7zaY4MU https://www.youtube.com/watch?v=rEDC5aVwna0
     https://www.youtube.com/watch?v=ZUKVH44Vl1k)
-    |> Enum.random
+      |> Enum.random()
+
     Message.reply(message, msg)
   end
 
   command pikasen(search) do
     if message.author.id == "134688787002425344" do
       end_timex = Timex.parse!("2020-09-26 00:00:00", "%Y-%m-%d %H:%M:%S", :strftime)
-      start_timex = Timex.now
+      start_timex = Timex.now()
       diff_in_days = Timex.diff(end_timex, start_timex, :days)
-      Message.reply(message, "Lo siento, eres demasiado 👶🏻 para utilizar este comando. Inténtalo en #{diff_in_days} días más.")
+
+      Message.reply(
+        message,
+        "Lo siento, eres demasiado 👶🏻 para utilizar este comando. Inténtalo en #{diff_in_days} días más."
+      )
     else
       url = "#{Application.fetch_env!(:coxir, :pikasen_url)}#{search}"
+
       case HTTPoison.get(url) do
         {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
           case Jason.decode(body) do
             {:ok, list} ->
               item = Enum.random(list)
-              message = "#{Application.fetch_env!(:coxir, :pikasen_cdn)}#{item["directory"]}/#{item["image"]}"
+
+              message =
+                "#{Application.fetch_env!(:coxir, :pikasen_cdn)}#{item["directory"]}/#{
+                  item["image"]
+                }"
+
               User.send_message(author, "😏 #{message}")
+
             {:error, _} ->
               User.send_message(author, "No encontré resultados 😟")
           end
+
         {:ok, %HTTPoison.Response{status_code: 404}} ->
           User.send_message(author, "No encontré resultados 😟")
+
         {:error, %HTTPoison.Error{reason: reason}} ->
-          IO.inspect reason
+          IO.inspect(reason)
       end
     end
   end
@@ -45,6 +60,7 @@ defmodule Bmo.Commands do
   command img(search) do
     url = "https://www.googleapis.com/customsearch/v1"
     headers = []
+
     opts = [
       params: [
         q: search,
@@ -52,18 +68,20 @@ defmodule Bmo.Commands do
         safe: "high",
         fields: "items(link)",
         cx: Application.fetch_env!(:coxir, :cse_id),
-        key: Application.fetch_env!(:coxir, :cse_key),
+        key: Application.fetch_env!(:coxir, :cse_key)
       ]
     ]
 
     case HTTPoison.get(url, headers, opts) do
       {:ok, %{status_code: 200, body: body}} ->
         {:ok, res} = Jason.decode(body)
-        item = res["items"] |> Enum.random
+        item = res["items"] |> Enum.random()
         Message.reply(message, item["link"])
+
       {:ok, %{status_code: 400, body: body}} ->
-        IO.inspect body
+        IO.inspect(body)
         Message.reply(message, "Ocurrió un error")
+
       {:error, _} ->
         Message.reply(message, "No encontré nada")
     end
@@ -72,6 +90,7 @@ defmodule Bmo.Commands do
   command gif(search) do
     url = "https://www.googleapis.com/customsearch/v1"
     headers = []
+
     opts = [
       params: [
         q: search,
@@ -82,18 +101,20 @@ defmodule Bmo.Commands do
         safe: "high",
         fields: "items(link)",
         cx: Application.fetch_env!(:coxir, :cse_id),
-        key: Application.fetch_env!(:coxir, :cse_key),
+        key: Application.fetch_env!(:coxir, :cse_key)
       ]
     ]
 
     case HTTPoison.get(url, headers, opts) do
       {:ok, %{status_code: 200, body: body}} ->
         {:ok, res} = Jason.decode(body)
-        item = res["items"] |> Enum.random
+        item = res["items"] |> Enum.random()
         Message.reply(message, item["link"])
+
       {:ok, %{status_code: 400, body: body}} ->
-        IO.inspect body
+        IO.inspect(body)
         Message.reply(message, "Ocurrió un error")
+
       {:error, _} ->
         Message.reply(message, "No encontré nada")
     end
@@ -102,6 +123,7 @@ defmodule Bmo.Commands do
   command yt(search) do
     url = "https://www.googleapis.com/youtube/v3/search"
     headers = []
+
     opts = [
       params: [
         key: Application.fetch_env!(:coxir, :cse_key),
@@ -109,16 +131,17 @@ defmodule Bmo.Commands do
         type: "video",
         order: "relevance",
         maxResults: 15,
-        q: search,
+        q: search
       ]
     ]
 
     case HTTPoison.get(url, headers, opts) do
       {:ok, %{status_code: 200, body: body}} ->
-        res = Jason.decode! body
+        res = Jason.decode!(body)
         items = res["items"]
         video_id = Enum.at(items, 0)["id"]["videoId"]
         Message.reply(message, "https://youtu.be/#{video_id}")
+
       _ ->
         Message.reply(message, "No encontré nada")
     end
@@ -126,10 +149,12 @@ defmodule Bmo.Commands do
 
   command horoscopo(sign) do
     url = "https://api.adderou.cl/tyaas/"
+
     case HTTPoison.get(url) do
       {:ok, %{status_code: 200, body: body}} ->
-        {:ok, response} = body |> Jason.decode
+        {:ok, response} = body |> Jason.decode()
         prediction = response["horoscopo"] |> Map.get(sign)
+
         if prediction do
           msg = """
           ❤️ #{prediction["amor"]}\n
@@ -138,80 +163,107 @@ defmodule Bmo.Commands do
           🔢 #{prediction["numero"]}\n
           🎨 #{prediction["color"]}\n
           """
+
           Message.reply(message, msg)
         else
           Message.reply(message, "Ese no es un signo válido")
         end
+
       {:error, _} ->
         Message.reply(message, "Ocurrió un error")
     end
   end
 
   command random(options) do
-    option = String.split(options, ",") |> Enum.random
+    option = String.split(options, ",") |> Enum.random()
     Message.reply(message, "🎲 #{option}")
   end
 
   command pregunta(question) do
-    answer = [
-      "En mi opinión, sí",
-      "Es cierto",
-      "Es decididamente así",
-      "Probablemente",
-      "Buen pronóstico",
-      "Todo apunta a que sí",
-      "Sin duda",
-      "Sí",
-      "Sí - definitivamente",
-      "Debes confiar en ello",
-      "Respuesta vaga, vuelve a intentarlo",
-      "Pregunta en otro momento",
-      "Será mejor que no te lo diga ahora",
-      "No puedo predecirlo ahora",
-      "Concéntrate y vuelve a preguntar",
-      "No cuentes con ello",
-      "Mi respuesta es no",
-      "Mis fuentes me dicen que no",
-      "Las perspectivas no son buenas",
-      "Muy dudoso"
-    ] |> Enum.random
+    answer =
+      [
+        "En mi opinión, sí",
+        "Es cierto",
+        "Es decididamente así",
+        "Probablemente",
+        "Buen pronóstico",
+        "Todo apunta a que sí",
+        "Sin duda",
+        "Sí",
+        "Sí - definitivamente",
+        "Debes confiar en ello",
+        "Respuesta vaga, vuelve a intentarlo",
+        "Pregunta en otro momento",
+        "Será mejor que no te lo diga ahora",
+        "No puedo predecirlo ahora",
+        "Concéntrate y vuelve a preguntar",
+        "No cuentes con ello",
+        "Mi respuesta es no",
+        "Mis fuentes me dicen que no",
+        "Las perspectivas no son buenas",
+        "Muy dudoso"
+      ]
+      |> Enum.random()
+
     Message.reply(message, answer)
   end
 
   command cachipun(input) do
     url = "http://api.giphy.com/v1/gifs/search"
     headers = []
+
     opts = [
       params: [
         api_key: Application.fetch_env!(:coxir, :giphy_key),
-        q: "defeat",
+        q: "defeat"
       ]
     ]
-    bot_choice = ~w(piedra papel tijeras)a |> Enum.random
+
+    bot_choice = ~w(piedra papel tijeras)a |> Enum.random()
+
     moves = %{
       piedra: %{piedra: "Empate ☯️", papel: "Perdiste 😢", tijeras: "Ganaste 🎉"},
       papel: %{piedra: "Ganaste 🎉", papel: "Empate ☯️", tijeras: "Perdiste 😢"},
-      tijeras: %{piedra: "Perdiste 😢", papel: "Ganaste 🎉", tijeras: "Empate ☯️"},
+      tijeras: %{piedra: "Perdiste 😢", papel: "Ganaste 🎉", tijeras: "Empate ☯️"}
     }
+
     if String.starts_with?(input, "varita") do
       case HTTPoison.get(url, headers, opts) do
         {:ok, %{status_code: 200, body: body}} ->
-          gif_url = body |> Jason.decode! |> get_in(["data"]) |> Enum.random |> get_in(["images", "downsized_large", "url"])
+          gif_url =
+            body
+            |> Jason.decode!()
+            |> get_in(["data"])
+            |> Enum.random()
+            |> get_in(["images", "downsized_large", "url"])
+
           Message.reply(message, gif_url)
+
         {:error, _} ->
           Message.reply(message, "Ganaste 💥")
       end
     else
-      Message.reply(message, "El bot escogió #{bot_choice}. #{moves[String.to_atom(input)][bot_choice]}")
+      Message.reply(
+        message,
+        "El bot escogió #{bot_choice}. #{moves[String.to_atom(input)][bot_choice]}"
+      )
     end
   end
 
   command frase_vitoco do
     url = Application.fetch_env!(:coxir, :vitoco_url)
+
     case HTTPoison.get(url) do
       {:ok, %{status_code: 200, body: body}} ->
-        phrase = body |> Jason.decode! |> get_in(["feed", "entry"]) |> Enum.random |> get_in(["title", "$t"])
+        phrase =
+          body
+          |> Jason.decode!()
+          |> get_in(["feed", "entry"])
+          |> Enum.random()
+          |> get_in(["title", "$t"])
+
         Message.reply(message, "💣 _#{phrase}_")
+
       {:error, _} ->
         Message.reply(message, "Ocurrió un error 💥")
     end
@@ -219,6 +271,7 @@ defmodule Bmo.Commands do
 
   command dame_un(human) do
     key = String.to_atom(human)
+
     mappings = %{
       ernesto: ["nerd", "dwarf"],
       gon: ["masked man"],
@@ -234,19 +287,29 @@ defmodule Bmo.Commands do
       lucas: ["stoner"],
       yvo: ["pervert"]
     }
-    search_term = mappings[key] |> Enum.random
+
+    search_term = mappings[key] |> Enum.random()
     url = "http://api.giphy.com/v1/gifs/search"
     headers = []
+
     opts = [
       params: [
         api_key: Application.fetch_env!(:coxir, :giphy_key),
-        q: search_term,
+        q: search_term
       ]
     ]
+
     case HTTPoison.get(url, headers, opts) do
       {:ok, %{status_code: 200, body: body}} ->
-        gif_url = body |> Jason.decode! |> get_in(["data"]) |> Enum.random |> get_in(["images", "downsized_large", "url"])
+        gif_url =
+          body
+          |> Jason.decode!()
+          |> get_in(["data"])
+          |> Enum.random()
+          |> get_in(["images", "downsized_large", "url"])
+
         Message.reply(message, gif_url)
+
       {:error, _} ->
         Message.reply(message, "Ocurrió un error 😢")
     end

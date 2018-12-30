@@ -7,6 +7,7 @@ defmodule Bmo.Consumer do
       type: 0,
       name: "on Elixir"
     }
+
     Gateway.set_status("online", game)
 
     {:ok, state}
