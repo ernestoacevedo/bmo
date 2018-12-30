@@ -217,6 +217,41 @@ defmodule Bmo.Commands do
     end
   end
 
+  command dame_un(human) do
+    key = String.to_atom(human)
+    mappings = %{
+      ernesto: ["nerd", "dwarf"],
+      gon: ["masked man"],
+      wasabi: ["eww", "lux lol", "uber eats", "carlton dance", "wasabi"],
+      seba: ["number one", "i am the best"],
+      tito: ["drunk"],
+      fabian: ["angry"],
+      dario: ["loli anime"],
+      martin: ["mouse", "fortnite dance", "kid"],
+      jaime: ["in bed"],
+      vitoco: ["explosion"],
+      willy: ["cop"],
+      lucas: ["stoner"],
+      yvo: ["pervert"]
+    }
+    search_term = mappings[key] |> Enum.random
+    url = "http://api.giphy.com/v1/gifs/search"
+    headers = []
+    opts = [
+      params: [
+        api_key: Application.fetch_env!(:coxir, :giphy_key),
+        q: search_term,
+      ]
+    ]
+    case HTTPoison.get(url, headers, opts) do
+      {:ok, %{status_code: 200, body: body}} ->
+        gif_url = body |> Jason.decode! |> get_in(["data"]) |> Enum.random |> get_in(["images", "downsized_large", "url"])
+        Message.reply(message, gif_url)
+      {:error, _} ->
+        Message.reply(message, "Ocurrió un error 😢")
+    end
+  end
+
   command help do
     list = help()
     Message.reply(message, list)
