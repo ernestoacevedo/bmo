@@ -178,6 +178,34 @@ defmodule Bmo.Commands do
     Message.reply(message, answer)
   end
 
+  command cachipun(input) do
+    url = "http://api.giphy.com/v1/gifs/search"
+    headers = []
+    opts = [
+      params: [
+        api_key: Application.fetch_env!(:coxir, :giphy_key),
+        q: "defeat",
+      ]
+    ]
+    bot_choice = ~w(piedra papel tijeras)a |> Enum.random
+    moves = %{
+      piedra: %{piedra: "Empate ☯️", papel: "Perdiste 😢", tijeras: "Ganaste 🎉"},
+      papel: %{piedra: "Ganaste 🎉", papel: "Empate ☯️", tijeras: "Perdiste 😢"},
+      tijeras: %{piedra: "Perdiste 😢", papel: "Ganaste 🎉", tijeras: "Empate ☯️"},
+    }
+    if String.starts_with?(input, "varita") do
+      case HTTPoison.get(url, headers, opts) do
+        {:ok, %{status_code: 200, body: body}} ->
+          gif_url = body |> Jason.decode! |> get_in(["data"]) |> Enum.random |> get_in(["images", "downsized_large", "url"])
+          Message.reply(message, gif_url)
+        {:error, _} ->
+          Message.reply(message, "Ganaste 💥")
+      end
+    else
+      Message.reply(message, "El bot escogió #{bot_choice}. #{moves[String.to_atom(input)][bot_choice]}")
+    end
+  end
+
   command help do
     list = help()
     Message.reply(message, list)
