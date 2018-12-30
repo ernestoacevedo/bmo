@@ -206,6 +206,17 @@ defmodule Bmo.Commands do
     end
   end
 
+  command frase_vitoco do
+    url = Application.fetch_env!(:coxir, :vitoco_url)
+    case HTTPoison.get(url) do
+      {:ok, %{status_code: 200, body: body}} ->
+        phrase = body |> Jason.decode! |> get_in(["feed", "entry"]) |> Enum.random |> get_in(["title", "$t"])
+        Message.reply(message, "💣 _#{phrase}_")
+      {:error, _} ->
+        Message.reply(message, "Ocurrió un error 💥")
+    end
+  end
+
   command help do
     list = help()
     Message.reply(message, list)
